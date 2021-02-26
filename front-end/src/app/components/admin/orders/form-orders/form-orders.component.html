@@ -1,0 +1,134 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-sm-12">
+            <h1>Form</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-sm-12">
+            <form [formGroup]="form" (ngSubmit)="createOrder()" *ngIf="isLoaded">
+                <div class="form-group">
+                    <input type="date" class="form-control" formControlName="fecha" placeholder="Fecha">
+                    <span class="text-danger" *ngIf="form.get('fecha').status != 'VALID' && form.get('fecha').touched">La fecha es obligatoria.</span>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" formControlName="clienteId">
+                        <option [ngValue]="null" selected disabled>Elegi un cliente...</option>
+                        <option *ngFor="let c of customers" value="{{c.clienteId}}">{{c.nombre}}</option>
+                    </select>
+                    <span class="text-danger" *ngIf="form.get('clienteId').status != 'VALID' && form.get('clienteId').touched"></span>
+                </div>
+                <div class="text-right mb-2">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addProductModal">
+                        Add product
+                    </button>
+                </div>
+                <table class="table text-center">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Editar</th>
+                        <th scope="col">Borrar</th>
+                      </tr>
+                    </thead>
+                    <tbody #tbodyDetalle>
+                      <tr *ngFor="let ps of productsSelected">
+                        <th scope="row">{{ps.productoId}}</th>
+                        <td>{{ps.descripcion}}</td>
+                        <td>
+                            {{ps.cantidad}}
+                        </td>
+                        <td>$ {{ps.precio}}</td>
+                        <td><button type="button" class="btn btn-warning fa fa-edit" data-toggle="modal" data-target="#editProductModal" (click)="getProductoDetail(ps.productoId)"></button></td>
+                        <td><button type="button" class="btn btn-danger fa fa-trash" (click)="deleteProduct(ps.productoId)"></button></td>
+                      </tr>
+                    </tbody>
+                </table>
+                <button type="submit" [disabled]="form.invalid" class="btn btn-primary btn-block">Create order</button>
+                <button type="button" class="btn btn-warning btn-block" routerLink="/admin/orders/all">Quit</button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add product to the order</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <table class="table text-center">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Add to order</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of products">
+                    <th scope="row">{{p.productoId}}</th>
+                    <td>{{p.descripcion}}</td>
+                    <td>$ {{p.precio}}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm fa fa-plus" (click)="addProductToOrder(p)"></button>
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <table class="table text-center">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="showEditProductDetail" #trProductEditDetail>
+                    <th scope="row">{{productDetailToEdit.productoId}}</th>
+                    <td>{{productDetailToEdit.descripcion}}</td>
+                    <td>
+                        <input type="number" class="form-control" value="{{productDetailToEdit.cantidad}}">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" value="{{productDetailToEdit.precio}}">
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="editProductDetail(productDetailToEdit)"  data-dismiss="modal">Save changes</button>
+        </div>
+      </div>
+    </div>
+</div>
